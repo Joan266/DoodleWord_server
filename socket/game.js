@@ -1,7 +1,6 @@
 import gameController from '../DB/controllers/game.js';
 
 function wordIndicesGenerator(wordName) {
-  // Convert the word into an array of characters
   const letters = wordName.split('');
 
   // Calculate the number of letters to replace (30% of the length)
