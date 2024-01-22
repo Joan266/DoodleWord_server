@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import router from './express_router.js';
 import { MONGODB_URI, PORT } from './dotenv.js';
 import { socketConnection } from "./socket/index.js";
+// import wordController from './DB/controllers/word.js';
 
 const configExpress = async () => {
   const app = express();
@@ -16,7 +17,7 @@ const configExpress = async () => {
     optionsSuccessStatus: 200,
   }));
   app.use(express.json());
-  
+
   // Routes
   app.use(router);
 
@@ -29,13 +30,17 @@ const configExpress = async () => {
   const httpServer = createServer(app);
 
   try {
-     httpServer.listen(PORT || 5000);
+    httpServer.listen(PORT || 5000);
     console.log(`Listening on port ${PORT || 5000}`);
   } catch (error) {
     console.error("Error starting the server:", error);
   }
 
-  const io = new Server(httpServer);
+  const io = new Server(httpServer, {
+    cors: {
+      origin: '*',
+    }
+  });
 
   socketConnection(io);
 };

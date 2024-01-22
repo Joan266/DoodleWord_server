@@ -14,6 +14,4 @@ router.post('/api/addword', wordController.addWord);
 
 router.post('/api/randomwords', wordController.randomWords);
 
-
-
 export default router;
