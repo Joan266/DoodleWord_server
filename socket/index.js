@@ -2,6 +2,7 @@ import registerBoardHandlers from './board.js';
 import registerChatHandlers from './chat.js';
 import registerGameHandlers from './game.js';
 import userController from '../DB/controllers/user.js';
+import roomController from '../DB/controllers/room.js';
 
 export const socketConnection = async (io) => {
   io.on("connection", (socket) => {
@@ -25,5 +26,13 @@ export const socketConnection = async (io) => {
     socket.on('disconnect', () => {
       console.log('A user disconnected');
     });
+  });
+  io.of("/").adapter.on("delete-room", (room) => {
+    if (/^[A-Z0-9]{6}$/.test(room)) {
+      console.log(`room ${room} has been deleted`);
+      roomController.deleteRoom({ roomCode: room }, (result) => {
+        console.log(result.message);
+      });
+    }
   });
 };
