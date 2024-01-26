@@ -21,6 +21,9 @@ export const socketConnection = async (io) => {
         userController.deleteUser({ userId, roomId }, (result) => {
           console.log(result.message);
         });
+        userController.isUserArtist({ userId, roomId }, (result) => {
+          console.log(result.message);
+        });
       });
     });
     socket.on('disconnect', () => {

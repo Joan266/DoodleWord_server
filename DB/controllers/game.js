@@ -5,8 +5,8 @@ export default {
   startGame: async (roomId, callback) => {
     try {
       // Get the users from the room
-      const room = await Room.findById(roomId);
-      const { users } = room;
+      const room = await Room.findById(roomId).populate('game').exec();
+      const { users, game } = room;
       if (users.length < 2) {
         callback({
           success: false,
@@ -14,15 +14,16 @@ export default {
         });
         return;
       }
-      const game = await Game.findOne({ room: roomId });
 
+      const nextArtistId = users[0];
       game.artists = users;
       game.scores = [];
       game.round = 1;
       game.phase = 1;
+      game.artistId = nextArtistId;
       // Save the game
       await game.save();
-      const nextArtistId = game.artists[0];
+      console.log(game);
       callback({
         success: true,
         message: 'Game started successfully',
@@ -123,7 +124,7 @@ export default {
       });
     }
   },
-  isNextArtist: async ({ gameId, artistId }, callback) => {
+  isThereNextArtist: async ({ gameId, artistId }, callback) => {
     try {
       const game = await Game.findById(gameId);
       const artistIndex = game.artists.indexOf(artistId);
@@ -154,6 +155,7 @@ export default {
         const nextArtistId = game.artists[0];
         game.round += 1;
         game.phase = 1;
+        game.artistId = nextArtistId;
         await game.save();
 
         callback({
@@ -165,6 +167,7 @@ export default {
       }
 
       const nextArtistId = game.artists[artistIndex + 1];
+      game.artistId = nextArtistId;
       game.phase = 1;
       await game.save();
       callback({
