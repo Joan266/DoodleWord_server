@@ -47,7 +47,7 @@ export default async (socket, code, io) => {
   const endPhase2 = async (data) => {
     const { artistId, gameId } = data;
     console.log(`game_client:end_phase_2`);
-    gameController.isNextArtist({ gameId, artistId }, (result) => {
+    gameController.isThereNextArtist({ gameId, artistId }, (result) => {
       console.log(result.message);
       if (result.success) {
         console.log(`game_client:end_phase_2 result: ${result.data}`);
