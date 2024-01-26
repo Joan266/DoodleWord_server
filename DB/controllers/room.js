@@ -120,4 +120,30 @@ export default {
       res.status(500).json({ error: 'Not able to join the room' });
     }
   },
+  deleteRoom: async ({ roomCode }, callback) => {
+    try {
+      if (!roomCode) {
+        return callback({ success: false, message: 'Room code is required' });
+      }
+      // Check if the room exists
+      const room = await Room.findOne({ code: roomCode });
+      if (!room) {
+        return callback({ success: false, message: 'Unexisting room' });
+      }
+      // Use Promise.all to run multiple asynchronous operations concurrently
+      const [deletedGame, deletedRoom] = await Promise.all([
+        Game.findByIdAndDelete(room.game),
+        Room.findByIdAndDelete(room._id),
+      ]);
+      // Check if both deletion operations were successful
+      if (deletedGame && deletedRoom) {
+        callback({ success: true, message: 'Room deleted successfully' });
+      } else {
+        callback({ success: false, message: 'Failed to delete the room' });
+      }
+    } catch (error) {
+      callback({ success: false, message: `Error deleting room: ${error.message}` });
+      throw new Error('Failed to delete room');
+    }
+  },
 };

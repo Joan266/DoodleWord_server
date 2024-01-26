@@ -39,7 +39,7 @@ const configExpress = async () => {
   const io = new Server(httpServer, {
     cors: {
       origin: '*',
-    }
+    },
   });
 
   socketConnection(io);

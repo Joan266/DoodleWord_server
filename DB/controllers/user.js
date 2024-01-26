@@ -12,7 +12,7 @@ export default {
         if (roomUpdate) {
           callback({ success: true, message: `User with ID ${userId} deleted successfully` });
         } else {
-          callback({ success: false, message: `Failed to update room artists array` });
+          callback({ success: false, message: `Failed to update room users array` });
         }
       } else {
         callback({ success: false, message: `User with ID ${userId} not found` });
