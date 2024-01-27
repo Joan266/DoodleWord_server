@@ -15,7 +15,7 @@ export const socketConnection = async (io) => {
       registerBoardHandlers(socket, code);
       registerChatHandlers(socket, code, io);
       registerGameHandlers(socket, code, io);
-      socket.on('appClosing', () => {
+      socket.on('appClosing', async () => {
         console.log(`the userId: ${user._id}`);
         io.to(code).emit("user:leave", { userId: user._id });
         const userId = user._id;

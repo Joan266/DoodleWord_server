@@ -23,23 +23,32 @@ export default {
   },
   isUserArtist: async ({ userId, roomId }, callback) => {
     try {
-      const room = await Room.findOne({ _id: roomId }).populate('game', 'artistId').exec();
-      const { artistId, _id } = room.game;
-      if (!artistId) {
-        return callback({ success: false, message: `Not ArtistId found in the game.` });
+      const room = await Room.findOne({ _id: roomId }).populate('game', 'artistId _id').exec();
+
+      if (!room || !room.game || !room.game.artistId) {
+        return callback({ success: false, message: 'No artistId found in the game.' });
       }
+
+      const { artistId, _id } = room.game;
+
       if (artistId === userId) {
         return callback({
           success: true,
-          message: `userId ${userId} an artistId ${artistId} match`,
+          message: `userId ${userId} and artistId ${artistId} match`,
           gameId: _id,
           artistId,
         });
       }
-      callback({ success: false, message: `userId ${userId} an artistId ${artistId} dont match` });
+
+      callback({
+        success: false,
+        message: `userId ${userId} and artistId ${artistId} don't match`,
+      });
     } catch (error) {
-      callback({ success: false, message: `Error checking if user is Artist: ${error.message}` });
-      throw new Error('Failed to delete user');
+      callback({
+        success: false,
+        message: `Error checking if user is Artist: ${error.message}`,
+      });
     }
   },
 };
