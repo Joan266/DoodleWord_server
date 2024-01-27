@@ -3,6 +3,7 @@ import registerChatHandlers from './chat.js';
 import registerGameHandlers from './game.js';
 import userController from '../DB/controllers/user.js';
 import roomController from '../DB/controllers/room.js';
+import gameController from '../DB/controllers/game.js';
 
 export const socketConnection = async (io) => {
   io.on("connection", (socket) => {
@@ -14,7 +15,7 @@ export const socketConnection = async (io) => {
       registerBoardHandlers(socket, code);
       registerChatHandlers(socket, code, io);
       registerGameHandlers(socket, code, io);
-      socket.on('appClosing', () => {
+      socket.on('appClosing', async () => {
         console.log(`the userId: ${user._id}`);
         io.to(code).emit("user:leave", { userId: user._id });
         const userId = user._id;
@@ -23,6 +24,22 @@ export const socketConnection = async (io) => {
         });
         userController.isUserArtist({ userId, roomId }, (result) => {
           console.log(result.message);
+          if (result.success) {
+            gameController
+              .isThereNextArtist(
+                {
+                  gameId: result.gameId,
+                  artistId: result.artistId,
+                },
+                (secondResult) => {
+                  console.log(secondResult.message);
+                  if (secondResult.success) {
+                    console.log(`appClosing isThereNextArtist result: ${secondResult.data}`);
+                    io.to(code).emit("game_server:set_game_state", secondResult.data);
+                  }
+                },
+              );
+          }
         });
       });
     });
