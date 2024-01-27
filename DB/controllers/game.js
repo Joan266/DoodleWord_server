@@ -128,7 +128,6 @@ export default {
     try {
       const game = await Game.findById(gameId);
       const artistIndex = game.artists.indexOf(artistId);
-      console.log(game);
       console.log(`artistId:${artistId}, artistIndex:${artistIndex}`);
       if (artistIndex === -1) {
         callback({
