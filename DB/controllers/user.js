@@ -126,6 +126,8 @@ export default {
     }
     if (!room.owner || room.owner._id === userId) {
       const randomUser = room.users[Math.floor(Math.random() * room.users.length)];
+      room.owner = randomUser;
+      await room.save();
       return callback({
         success: true,
         message: 'New owner selected',
