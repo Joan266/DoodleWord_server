@@ -19,26 +19,14 @@ export const socketConnection = async (io) => {
         console.log(`the userId: ${user._id}`);
         io.to(code).emit("user:leave", { userId: user._id });
         const userId = user._id;
-        userController.deleteUser({ userId, roomId }, (result) => {
+        await userController.deleteUser({ userId, roomId }, async (result) => {
           console.log(result.message);
         });
-        userController.isUserArtist({ userId, roomId }, (result) => {
+        await userController.artistDropOut({ userId, roomId }, async (result) => {
           console.log(result.message);
           if (result.success) {
-            gameController
-              .isThereNextArtist(
-                {
-                  gameId: result.gameId,
-                  artistId: result.artistId,
-                },
-                (secondResult) => {
-                  console.log(secondResult.message);
-                  if (secondResult.success) {
-                    console.log(`appClosing isThereNextArtist result: ${secondResult.data}`);
-                    io.to(code).emit("game_server:set_game_state", secondResult.data);
-                  }
-                },
-              );
+            console.log(`appClosing artistDropOut result: ${result.data}`);
+            io.to(code).emit("game_server:set_game_state", result.data);
           }
         });
       });

@@ -138,17 +138,6 @@ export default {
       }
       game.scores = [];
       await game.save();
-      if (game.artists.length < 2) {
-        game.phase = 0;
-        game.round = 1;
-        await game.save();
-        callback({
-          success: true,
-          message: 'Players list has to be more than one. End of the game. Phase 0.',
-          data: { round: game.round, phase: game.phase, nextArtistId: false },
-        });
-        return;
-      }
       if (artistIndex === game.artists.length - 1) {
         if (game.round === game.total_rounds) {
           game.phase = 0;
