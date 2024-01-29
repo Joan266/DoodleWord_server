@@ -19,7 +19,7 @@ export const socketConnection = async (io) => {
         console.log(`the userId: ${user._id}`);
         io.to(code).emit("user:leave", { userId: user._id });
         const userId = user._id;
-        await userController.deleteUser({ userId, roomId }, async (result) => {
+        await userController.deleteUser({ userId }, async (result) => {
           console.log(result.message);
         });
         await userController.artistDropOut({ userId, roomId }, async (result) => {
@@ -27,6 +27,13 @@ export const socketConnection = async (io) => {
           if (result.success) {
             console.log(`appClosing artistDropOut result: ${result.data}`);
             io.to(code).emit("game_server:set_game_state", result.data);
+          }
+        });
+        await userController.ownerDropOut({ userId, roomId }, async (result) => {
+          console.log(result.message);
+          if (result.success) {
+            console.log(`appClosing ownerDropOut result: ${result.newOwner}`);
+            io.to(code).emit("room_server:set_new_Owner", { newOwner: result.newOwner });
           }
         });
       });
