@@ -12,6 +12,12 @@ export default {
         });
       }
       const { game } = room;
+      if (game.phase === 0) {
+        return callback({
+          success: false,
+          message: 'Phase 0.',
+        });
+      }
       const artistIndex = game.artists.indexOf(userId);
       if (artistIndex === -1) {
         return callback({
@@ -81,19 +87,15 @@ export default {
       });
     }
   },
-  deleteUser: async ({ userId, roomId }, callback) => {
+  deleteUser: async ({ userId }, callback) => {
     try {
       const deletedUser = await User.findByIdAndDelete(userId);
-      const room = await Room.findById(roomId);
-      room.users.pull(userId);
-      await room.save();
-      if (!deletedUser || !room) {
+      if (!deletedUser) {
         return callback({
           success: false,
           message: 'Fail to delete user',
         });
       }
-
       callback({
         success: true,
         message: 'User deleted successfully.',
@@ -105,5 +107,34 @@ export default {
       });
       throw new Error('Failed to delete user');
     }
+  },
+  ownerDropOut: async ({ userId, roomId }, callback) => {
+    const room = await Room.findById(roomId).populate('owner').exec();
+    if (!room) {
+      return callback({
+        success: false,
+        message: 'Room not found',
+      });
+    }
+    room.users.pull(userId);
+    await room.save();
+    if (room.users.length === 0) {
+      return callback({
+        success: false,
+        message: 'No need for new owner.',
+      });
+    }
+    if (!room.owner || room.owner._id === userId) {
+      const randomUser = room.users[Math.floor(Math.random() * room.users.length)];
+      return callback({
+        success: true,
+        message: 'New owner selected',
+        newOwner: randomUser,
+      });
+    }
+    callback({
+      success: false,
+      message: 'No need to promote user to owner.',
+    });
   },
 };
